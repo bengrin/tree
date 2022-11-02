@@ -8,6 +8,7 @@ export function useWorkflowsStatus(){
     useEffect(() => {
         setWorkflowsStatus(makeHashDeepWorkflowsStatus(mockWorkflows));
     },[]);
+    const workflowsStatusId = workflowsStatus.filter(status => status.open).map(status => status.id)
     const enabledEdit = (id: string | number) => {
         setWorkflowsStatus(
             workflowsStatus.map((item) => {
@@ -35,6 +36,7 @@ export function useWorkflowsStatus(){
     return {
         workflowsStatus,
         enabledEdit,
-        enabledOpen
+        enabledOpen,
+        workflowsStatusId,
     };
 }

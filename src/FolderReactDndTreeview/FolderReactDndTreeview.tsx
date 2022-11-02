@@ -20,7 +20,7 @@ import { useWorkflows } from "./hooks/useWorkflows";
 function App() {
   const ref = useRef<TreeMethods>(null);
 
-  const {workflowsStatus , enabledEdit, enabledOpen} = useWorkflowsStatus()
+  const {workflowsStatus, workflowsStatusId , enabledEdit, enabledOpen} = useWorkflowsStatus()
   const handleEnabledOpen = (id: NodeModel["id"]) => enabledOpen(id);
   const handleEnabledEdit = (id: NodeModel["id"]) => enabledEdit(id);
 
@@ -30,9 +30,11 @@ function App() {
   const handleDelete = (id: NodeModel["id"]) => deleteTree(id);
   const handelCreateFolder = (id: NodeModel["id"]) => {
     createFolderTree(id)
-    handleEnabledOpen(id);
-    if(ref.current){
-      ref.current.open(id);
+    if(!workflowsStatusId.includes(id)){
+      handleEnabledOpen(id);
+      if(ref.current){
+        ref.current.open(id)
+      }
     }
   };
   const handelCreateConfig = (
@@ -40,9 +42,11 @@ function App() {
     id: NodeModel["id"]
   ) => {
     createConfigTree(id)
-    handleEnabledOpen(id);
-    if(ref.current){
-      ref.current.open(id)
+    if(!workflowsStatusId.includes(id)){
+      handleEnabledOpen(id);
+      if(ref.current){
+        ref.current.open(id)
+      }
     }
   };
 console.log(workflowsStatus.filter(status => status.open).map(status => status.id));
@@ -93,7 +97,7 @@ console.log(workflowsStatus.filter(status => status.open).map(status => status.i
             placeholderRender={(node, { depth }) => (
               <Placeholder node={node} depth={depth} />
             )}
-            initialOpen={workflowsStatus.filter(status => status.open).map(status => status.id)}
+            initialOpen={workflowsStatusId}
           />
         </div>
       </DndProvider>
