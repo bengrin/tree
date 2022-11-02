@@ -19,8 +19,6 @@ type TreeMenuProps = {
   onCreateConfig: (id: string) => void;
   onEdit: () => void;
   onDelete: () => void;
-  hideCreateFolder?: boolean;
-  hideCreateConfig?: boolean;
   hideEdit?: boolean;
 };
 
@@ -33,8 +31,6 @@ export function TreeMenu({
   onCreateConfig,
   onEdit,
   onDelete,
-  hideCreateFolder = false,
-  hideCreateConfig = false,
   hideEdit = false,
 }: TreeMenuProps) {
   const listConfig = [
@@ -102,12 +98,9 @@ export function TreeMenu({
         horizontal: "left",
       }}
     >
-      {!hideCreateFolder && handleCreateFolder && (
         <MenuItem key="create-folder" onClick={handleCreateFolder}>
-          <ListItemText primary="Create folder" />
+            <ListItemText primary="Create folder" />
         </MenuItem>
-      )}
-      {!hideCreateConfig && handleCreateConfig && (
         <List key="create-config" component="nav">
           <ListItemButton onClick={handleOpenMenuConfig}>
             <ListItemText primary="Create config" />
@@ -127,7 +120,6 @@ export function TreeMenu({
             </List>
           </Collapse>
         </List>
-      )}
       {!hideEdit && handleEdit && (
         <MenuItem key="edit" onClick={handleEdit}>
           <ListItemText primary="Edit" />

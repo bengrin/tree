@@ -1,0 +1,17 @@
+
+
+.draggingSource {
+  opacity: 0.3;
+}
+
+.placeholderContainer {
+  position: relative;
+}
+
+.dropTarget {
+  background-color: #e8f0fe;
+}
+
+ul {
+  list-style: none;
+}

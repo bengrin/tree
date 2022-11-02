@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
 import { Box } from '@mui/system';
-import Folder from './FolderTabOld/FolderTab';
+import FolderReactDndTreeview from './FolderReactDndTreeview/FolderReactDndTreeview';
 
 function App() {
   return (
     <Box>
-      <Folder />
+      <FolderReactDndTreeview />
     </Box>
   );
 }
