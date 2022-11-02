@@ -26,18 +26,10 @@ export function useWorkflowsStatus(){
     };
     const enabledOpen = (id: string | number) => {
         setWorkflowsStatus(
-            workflowsStatus.map((item) => {
-            if (item.id === id) {
-                return {
+            workflowsStatus.map((item) => ({
                 ...item,
-                open: !item.open
-                };
-            }
-            return {
-                ...item,
-                open: false
-            };
-            })
+                open: item.id === id ? !item.open : item.open,
+            }))
         );
     };
     return {

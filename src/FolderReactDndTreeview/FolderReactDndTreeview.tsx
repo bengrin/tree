@@ -45,6 +45,7 @@ function App() {
       ref.current.open(id)
     }
   };
+console.log(workflowsStatus.filter(status => status.open).map(status => status.id));
 
   return (
     <>
@@ -55,13 +56,12 @@ function App() {
             ref={ref}
             tree={treeData}
             rootId={0}
-            render={(node, { depth, hasChild, onToggle, isOpen }) => (
+            render={(node, { depth, hasChild, onToggle }) => (
               <CustomNode
                 {...makePropsTreeItem({
                   workflowsStatus,
                   node
                 })}
-                isOpen={isOpen}
                 node={node}
                 depth={depth}
                 onToggle={(id)=>{
@@ -90,10 +90,10 @@ function App() {
                 return true;
               }
             }}
-            dropTargetOffset={10}
             placeholderRender={(node, { depth }) => (
               <Placeholder node={node} depth={depth} />
             )}
+            initialOpen={workflowsStatus.filter(status => status.open).map(status => status.id)}
           />
         </div>
       </DndProvider>

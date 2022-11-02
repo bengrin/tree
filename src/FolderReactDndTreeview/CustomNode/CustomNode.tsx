@@ -18,7 +18,6 @@ type Props = {
   onEdit: (id: NodeModel["id"], text: NodeModel["text"]) => void;
   hasChild: boolean;
   enabledEdit: boolean;
-
   onDelete: (id:  NodeModel["id"]) => void;
   onCreateConfig: (
     configId: string,
@@ -40,7 +39,6 @@ export const CustomNode: React.FC<Props> = (props) => {
     e.stopPropagation();
     props.onToggle(id);
   };
-
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
