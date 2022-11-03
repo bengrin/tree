@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
-import { IconButton, TextField } from "@mui/material";
+import { Box, IconButton, Stack, TextField } from "@mui/material";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -12,11 +12,11 @@ type TreeNameProps = {
   enabledEdit: boolean;
   onEnabledEdit: (id: NodeModel["id"]) => void;
   onEdit: (id: NodeModel["id"], name: string) => void;
-  
+  onOpen: (e: React.MouseEvent) => void;
 };
 
 export const TreeName: React.FC<TreeNameProps> = (props) => {
-  const { id, text, enabledEdit, onEnabledEdit, onEdit } = props;
+  const { id, text, enabledEdit, onEnabledEdit, onEdit, onOpen } = props;
 
   const [name, setName] = useState("");
   useEffect(() => {
@@ -29,7 +29,6 @@ export const TreeName: React.FC<TreeNameProps> = (props) => {
     onEnabledEdit(id);
   };
   const handleEditSave = () => {
-    onEnabledEdit(id);
     onEdit(id, name);
   };
   const handelKeyPress = (event: React.KeyboardEvent) => {
@@ -40,21 +39,25 @@ export const TreeName: React.FC<TreeNameProps> = (props) => {
 
   return enabledEdit ? (
     <>
-      <TextField
-      value={text}
-      onChange={handleInput}
-      onKeyDown={handelKeyPress}
-      />
-      <IconButton onClick={handleEditSave}>
-      <CheckIcon htmlColor="green" />
-      </IconButton>
-      <IconButton onClick={handleEdit}>
-      <CloseIcon htmlColor="red" />
-      </IconButton>
+      <Stack direction="row">
+        <TextField
+          value={name}
+          onChange={handleInput}
+          onKeyDown={handelKeyPress}
+        />
+        <IconButton onClick={handleEditSave}>
+          <CheckIcon htmlColor="green" />
+        </IconButton>
+        <IconButton onClick={handleEdit}>
+          <CloseIcon htmlColor="red" />
+        </IconButton>
+      </Stack>
     </>
   ) : (
-    <Typography>
-      {text.length > 40 ? text.slice(0, 40) + "..." : text}
-    </Typography>
+    <Box onClick={onOpen}>
+      <Typography>
+        {name.length > 40 ? name.slice(0, 40) + "..." : name}
+      </Typography>
+    </Box>
   );
 };
