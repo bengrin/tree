@@ -47,11 +47,11 @@ export function useWorkflows() {
     };
     setTreeData([...treeData, newWorkflowItem]);
   };
-  const createConfigTree = (id: NodeModel["id"]) => {
+  const createConfigTree = (id: NodeModel["id"], configId: string) => {
     const newWorkflowItem: NodeModel<WorkflowItem> = {
       id: Math.floor(Math.random() * 9000),
       parent: id,
-      text: "new config",
+      text: configId,
       data: {
         type: WorkItemType.config,
       },
@@ -175,7 +175,7 @@ export function useWorkflows() {
 
     setSelectedNodes([]);
   };
-  const handleDop = (
+  const canDrop = (
     tree: NodeModel<WorkflowItem>[],
     options: DropOptions<WorkflowItem>
   ) => {
@@ -200,8 +200,9 @@ export function useWorkflows() {
     handleDrop,
     handleDragStart,
     handleDragEnd,
-    handleDop,
+    canDrop,
     isDragging,
     handleClick,
+    selectedNodes,
   };
 }

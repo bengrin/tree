@@ -12,6 +12,37 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { WorkflowItem } from "../types";
 
+export const listConfig = [
+  {
+    name: "Application",
+    value: "Application",
+  },
+  {
+    name: "Connection",
+    value: "Connection",
+  },
+  {
+    name: "API",
+    value: "API",
+  },
+  {
+    name: "Data Transform",
+    value: "Data Transform",
+  },
+  {
+    name: "Workflow",
+    value: "Workflow",
+  },
+  {
+    name: "Template",
+    value: "Template",
+  },
+  {
+    name: "Rule",
+    value: "Rule",
+  },
+];
+
 type TreeMenuProps = {
   node: NodeModel<WorkflowItem>;
   id: string;
@@ -43,32 +74,6 @@ export function TreeMenu({
   hideCreateFolder = false,
   hideCreateConfig = false,
 }: TreeMenuProps) {
-  const listConfig = [
-    {
-      name: "config-1",
-      value: "1",
-    },
-    {
-      name: "config-2",
-      value: "2",
-    },
-    {
-      name: "config-3",
-      value: "3",
-    },
-    {
-      name: "config-4",
-      value: "4",
-    },
-    {
-      name: "config-5",
-      value: "5",
-    },
-    {
-      name: "config-6",
-      value: "6",
-    },
-  ];
   const [openMenuConfig, setOpenMenuConfig] = useState(false);
 
   const handleOpenMenuConfig = () => {

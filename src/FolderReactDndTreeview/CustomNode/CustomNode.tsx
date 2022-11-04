@@ -1,7 +1,7 @@
 import React, { MouseEvent, useState } from "react";
 import { NodeModel, useDragOver } from "@minoru/react-dnd-treeview";
 import { WorkflowItem, WorkItemType } from "../types";
-import { IconButton, Stack } from "@mui/material";
+import { Badge, Box, IconButton, Stack } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { TreeName } from "./TreeName";
 import { TreeMenu } from "./TreeMenu";
@@ -22,6 +22,10 @@ type Props = {
   onClone: (id: NodeModel["id"]) => void;
   onCreateConfig: (configId: string, id: NodeModel["id"]) => void;
   onCreateFolder: (id: NodeModel["id"]) => void;
+  isSelected: boolean;
+  isDragging: boolean;
+  onClick: (e: React.MouseEvent, node: NodeModel<WorkflowItem>) => void;
+  testIdPrefix?: string;
 };
 
 export const CustomNode: React.FC<Props> = (props) => {
@@ -38,13 +42,20 @@ export const CustomNode: React.FC<Props> = (props) => {
     onCreateConfig,
     onCreateFolder,
     onToggle,
+    isSelected,
+    isDragging,
+    onClick,
   } = props;
   const { id, text, data } = node;
   const indent = props.depth;
 
   const handleToggle = (e: MouseEvent) => {
     e.stopPropagation();
-    onToggle(id);
+    if (node?.data?.type === WorkItemType.config) {
+      onClick(e, node);
+    } else {
+      onToggle(id);
+    }
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -75,63 +86,76 @@ export const CustomNode: React.FC<Props> = (props) => {
   };
   const dragOverProps = useDragOver(id, isOpen, onToggle);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (node?.data?.type === WorkItemType.config) {
+      onClick(e, node);
+    }
+  };
+
   return (
-    <div className={`tree-node`} {...dragOverProps}>
-      <Stack
-        sx={{ ml: indent }}
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
+    <div className={`tree-node`} {...dragOverProps} onClick={handleClick}>
+      <Box
+        sx={{
+          backgroundColor: isSelected ? "#c4dbf1" : "transparent",
+        }}
       >
         <Stack
+          sx={{ ml: indent }}
           direction="row"
           alignItems="center"
-          justifyContent="flex-start"
-          spacing={1}
+          justifyContent="space-between"
         >
-          <TreeIconOpen
-            hasChild={hasChild}
-            isOpen={isOpen}
-            onOpen={handleToggle}
-          />
-          <TreeIconType node={node} onOpen={handleToggle} />
-          <TreeName
-            id={id}
-            text={text}
-            treeData={treeData}
-            enabledEdit={enabledEdit}
-            onOpen={handleToggle}
-            onEnabledEdit={onEnabledEdit}
-            onEdit={onEdit}
-          />
-        </Stack>
-        <Stack direction="row" alignItems="center" justifyContent="flex-end">
-          <IconButton
-            id={elementId}
-            onClick={handleOpenMenu}
-            aria-controls={openMenu ? elementId : undefined}
-            aria-haspopup="true"
-            aria-expanded={openMenu ? "true" : undefined}
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-start"
+            spacing={1}
           >
-            <MoreHorizIcon />
-          </IconButton>
-          <TreeMenu
-            node={node}
-            id={elementId}
-            open={openMenu}
-            anchorEl={anchorEl}
-            onClose={handleCloseMenu}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onClone={handleClone}
-            onCreateConfig={handleCreateConfig}
-            onCreateFolder={handleCreateFolder}
-            hideEdit={enabledEdit}
-            hideCreateFolder={data?.type === WorkItemType.config}
-            hideCreateConfig={data?.type === WorkItemType.config}
-          />
+            <TreeIconOpen
+              hasChild={hasChild}
+              isOpen={isOpen}
+              onOpen={handleToggle}
+            />
+
+            <TreeIconType node={node} onOpen={handleToggle} />
+            <TreeName
+              id={id}
+              text={text}
+              treeData={treeData}
+              enabledEdit={enabledEdit}
+              onOpen={handleToggle}
+              onEnabledEdit={onEnabledEdit}
+              onEdit={onEdit}
+            />
+          </Stack>
+          <Stack direction="row" alignItems="center" justifyContent="flex-end">
+            <IconButton
+              id={elementId}
+              onClick={handleOpenMenu}
+              aria-controls={openMenu ? elementId : undefined}
+              aria-haspopup="true"
+              aria-expanded={openMenu ? "true" : undefined}
+            >
+              <MoreHorizIcon />
+            </IconButton>
+            <TreeMenu
+              node={node}
+              id={elementId}
+              open={openMenu}
+              anchorEl={anchorEl}
+              onClose={handleCloseMenu}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onClone={handleClone}
+              onCreateConfig={handleCreateConfig}
+              onCreateFolder={handleCreateFolder}
+              hideEdit={enabledEdit}
+              hideCreateFolder={data?.type === WorkItemType.config}
+              hideCreateConfig={data?.type === WorkItemType.config}
+            />
+          </Stack>
         </Stack>
-      </Stack>
+      </Box>
     </div>
   );
 };

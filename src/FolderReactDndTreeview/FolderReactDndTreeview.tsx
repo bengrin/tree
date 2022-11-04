@@ -7,6 +7,7 @@ import {
   MultiBackend,
   getBackendOptions,
   TreeMethods,
+  DragLayerMonitorProps,
 } from "@minoru/react-dnd-treeview";
 import { WorkflowItem } from "./types";
 import { CustomNode } from "./CustomNode/CustomNode";
@@ -18,6 +19,8 @@ import { useWorkflowsStatus } from "./hooks/useWorkflowsStatus";
 import { useWorkflows } from "./hooks/useWorkflows";
 import Search from "./Search";
 import { Box } from "@mui/system";
+import { MultipleDragPreview } from "./MultipleDragPreview";
+import { CreatedRootElement } from "./CreatedRootElement";
 
 function App() {
   const ref = useRef<TreeMethods>(null);
@@ -37,26 +40,24 @@ function App() {
 
   const {
     treeData,
-    updateTree,
     editTreeName,
     deleteTree,
     cloneTree,
     createFolderTree,
     createConfigTree,
 
-    // handleDrop,
-    // handleDragStart,
-    // handleDragEnd,
-    // handleDop,
-    // isDragging,
-    // handleClick,
+    handleDrop,
+    handleDragStart,
+    handleDragEnd,
+    canDrop,
+    isDragging,
+    handleClick,
+    selectedNodes,
   } = useWorkflows();
   useEffect(() => {
     addNewItems(treeData);
   }, [treeData]);
 
-  const handleDrop = (newTree: NodeModel<WorkflowItem>[]) =>
-    updateTree(newTree);
   const handleEdit = (id: NodeModel["id"], text: NodeModel["text"]) => {
     handleEnabledEdit(id);
     editTreeName(id, text);
@@ -77,7 +78,7 @@ function App() {
     }
   };
   const handelCreateConfig = (configId: string, id: NodeModel["id"]) => {
-    createConfigTree(id);
+    createConfigTree(id, configId);
     if (!workflowsStatusOpenId.includes(id)) {
       handleEnabledOpen(id);
       if (ref.current) {
@@ -128,42 +129,55 @@ function App() {
               ref={ref}
               tree={treeDataSearch}
               rootId={0}
-              render={(node, { depth, hasChild, onToggle }) => (
-                <CustomNode
-                  {...makePropsTreeItem({
-                    workflowsStatus,
-                    node,
-                  })}
-                  treeData={treeData}
-                  node={node}
-                  depth={depth}
-                  onToggle={(id) => {
-                    handleEnabledOpen(id);
-                    onToggle();
-                  }}
-                  hasChild={hasChild}
-                  onEnabledEdit={handleEnabledEdit}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onClone={handleClone}
-                  onCreateConfig={handelCreateConfig}
-                  onCreateFolder={handelCreateFolder}
-                />
-              )}
-              dragPreviewRender={(monitorProps) => (
-                <CustomDragPreview monitorProps={monitorProps} />
-              )}
+              render={(node, { depth, hasChild, onToggle }) => {
+                const selected = selectedNodes.some(
+                  (selectedNode) => selectedNode.id === node.id
+                );
+
+                return (
+                  <CustomNode
+                    {...makePropsTreeItem({
+                      workflowsStatus,
+                      node,
+                    })}
+                    treeData={treeData}
+                    node={node}
+                    depth={depth}
+                    onToggle={(id) => {
+                      handleEnabledOpen(id);
+                      onToggle();
+                    }}
+                    hasChild={hasChild}
+                    onEnabledEdit={handleEnabledEdit}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onClone={handleClone}
+                    onCreateConfig={handelCreateConfig}
+                    onCreateFolder={handelCreateFolder}
+                    isSelected={selected}
+                    isDragging={selected && isDragging}
+                    onClick={handleClick}
+                  />
+                );
+              }}
               onDrop={handleDrop}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              canDrop={canDrop}
+              sort={false}
+              insertDroppableFirst={false}
               classes={{
                 placeholder: styles.placeholderContainer,
                 dropTarget: styles.dropTarget,
               }}
-              sort={false}
-              insertDroppableFirst={false}
-              canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
-                if (dragSource?.parent === dropTargetId) {
-                  return true;
+              dragPreviewRender={(
+                monitorProps: DragLayerMonitorProps<WorkflowItem>
+              ) => {
+                if (selectedNodes.length > 1) {
+                  return <MultipleDragPreview dragSources={selectedNodes} />;
                 }
+
+                return <CustomDragPreview monitorProps={monitorProps} />;
               }}
               placeholderRender={(node, { depth }) => (
                 <Placeholder node={node} depth={depth} />
@@ -173,6 +187,10 @@ function App() {
           ) : (
             <div>No found</div>
           )}
+          <CreatedRootElement
+            onCreateConfig={handelCreateConfig}
+            onCreateFolder={handelCreateFolder}
+          />
         </DndProvider>
       </Box>
     </>
