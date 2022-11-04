@@ -1,14 +1,15 @@
 import React, { MouseEvent, useState } from "react";
-import { NodeModel } from "@minoru/react-dnd-treeview";
+import { NodeModel, useDragOver } from "@minoru/react-dnd-treeview";
 import { WorkflowItem, WorkItemType } from "../types";
-import { Box, IconButton, ListItem, Stack } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { IconButton, Stack } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { TreeName } from "./TreeName";
 import { TreeMenu } from "./TreeMenu";
+import { TreeIconOpen } from "./TreeIconOpen";
+import { TreeIconType } from "./TreeIconType";
 
 type Props = {
+  treeData: NodeModel<WorkflowItem>[];
   node: NodeModel<WorkflowItem>;
   depth: number;
   isOpen: boolean;
@@ -18,12 +19,14 @@ type Props = {
   hasChild: boolean;
   enabledEdit: boolean;
   onDelete: (id: NodeModel["id"]) => void;
+  onClone: (id: NodeModel["id"]) => void;
   onCreateConfig: (configId: string, id: NodeModel["id"]) => void;
   onCreateFolder: (id: NodeModel["id"]) => void;
 };
 
 export const CustomNode: React.FC<Props> = (props) => {
   const {
+    treeData,
     node,
     hasChild,
     isOpen,
@@ -31,15 +34,17 @@ export const CustomNode: React.FC<Props> = (props) => {
     onEnabledEdit,
     onEdit,
     onDelete,
+    onClone,
     onCreateConfig,
     onCreateFolder,
+    onToggle,
   } = props;
   const { id, text, data } = node;
   const indent = props.depth;
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleToggle = (e: MouseEvent) => {
     e.stopPropagation();
-    props.onToggle(id);
+    onToggle(id);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -59,35 +64,41 @@ export const CustomNode: React.FC<Props> = (props) => {
   const handleDelete = () => {
     onDelete(id);
   };
+  const handleClone = () => {
+    onClone(id);
+  };
   const handleCreateFolder = () => {
     onCreateFolder(id);
   };
   const handleCreateConfig = (configId: string) => {
     onCreateConfig(configId, id);
   };
+  const dragOverProps = useDragOver(id, isOpen, onToggle);
 
   return (
-    <div className={`tree-node`}>
+    <div className={`tree-node`} {...dragOverProps}>
       <Stack
         sx={{ ml: indent }}
         direction="row"
         alignItems="center"
         justifyContent="space-between"
       >
-        <Stack direction="row" alignItems="center" justifyContent="flex-start">
-          <Box width={40}>
-            {hasChild && (
-              <IconButton
-                onClick={handleToggle}
-                aria-label={isOpen ? "close" : "open"}
-              >
-                {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </IconButton>
-            )}
-          </Box>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          spacing={1}
+        >
+          <TreeIconOpen
+            hasChild={hasChild}
+            isOpen={isOpen}
+            onOpen={handleToggle}
+          />
+          <TreeIconType node={node} onOpen={handleToggle} />
           <TreeName
             id={id}
             text={text}
+            treeData={treeData}
             enabledEdit={enabledEdit}
             onOpen={handleToggle}
             onEnabledEdit={onEnabledEdit}
@@ -105,16 +116,19 @@ export const CustomNode: React.FC<Props> = (props) => {
             <MoreHorizIcon />
           </IconButton>
           <TreeMenu
+            node={node}
             id={elementId}
             open={openMenu}
             anchorEl={anchorEl}
             onClose={handleCloseMenu}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onClone={handleClone}
             onCreateConfig={handleCreateConfig}
             onCreateFolder={handleCreateFolder}
             hideEdit={enabledEdit}
             hideCreateFolder={data?.type === WorkItemType.config}
+            hideCreateConfig={data?.type === WorkItemType.config}
           />
         </Stack>
       </Stack>

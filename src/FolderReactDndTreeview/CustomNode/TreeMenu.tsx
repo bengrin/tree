@@ -9,8 +9,11 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { NodeModel } from "@minoru/react-dnd-treeview";
+import { WorkflowItem } from "../types";
 
 type TreeMenuProps = {
+  node: NodeModel<WorkflowItem>;
   id: string;
   open: boolean;
   anchorEl: HTMLElement | null;
@@ -19,12 +22,14 @@ type TreeMenuProps = {
   onCreateConfig: (id: string) => void;
   onEdit: () => void;
   onDelete: () => void;
+  onClone: () => void;
   hideEdit?: boolean;
   hideCreateFolder?: boolean;
   hideCreateConfig?: boolean;
 };
 
 export function TreeMenu({
+  node,
   id,
   open,
   anchorEl,
@@ -33,6 +38,7 @@ export function TreeMenu({
   onCreateConfig,
   onEdit,
   onDelete,
+  onClone,
   hideEdit = false,
   hideCreateFolder = false,
   hideCreateConfig = false,
@@ -85,6 +91,10 @@ export function TreeMenu({
     onDelete();
     onClose();
   };
+  const handleClone = () => {
+    onClone();
+    onClose();
+  };
 
   return (
     <Menu
@@ -131,6 +141,11 @@ export function TreeMenu({
       {!hideEdit && handleEdit && (
         <MenuItem key="edit" onClick={handleEdit}>
           <ListItemText primary="Edit" />
+        </MenuItem>
+      )}
+      {node?.data?.type === "config" && (
+        <MenuItem key="clone" onClick={handleClone}>
+          <ListItemText primary="Clone" />
         </MenuItem>
       )}
       <MenuItem

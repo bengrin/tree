@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { CssBaseline } from "@mui/material";
 import {
@@ -16,36 +16,57 @@ import { CustomDragPreview } from "./CustomDragPreview";
 import { makePropsTreeItem } from "./CustomNode/helpers";
 import { useWorkflowsStatus } from "./hooks/useWorkflowsStatus";
 import { useWorkflows } from "./hooks/useWorkflows";
+import Search from "./Search";
+import { Box } from "@mui/system";
 
 function App() {
   const ref = useRef<TreeMethods>(null);
 
-  const { workflowsStatus, workflowsStatusOpenId, enabledEdit, enabledOpen } =
-    useWorkflowsStatus();
+  const {
+    workflowsStatus,
+    workflowsStatusOpenId,
+    enabledEdit,
+    enabledOpen,
+    addNewItems,
+    enabledOpenAll,
+    saveWorkflowsStatusScreen,
+    enableWorkflowsStatusScreen,
+  } = useWorkflowsStatus();
   const handleEnabledOpen = (id: NodeModel["id"]) => enabledOpen(id);
-  const handleEnabledEdit = (id: NodeModel["id"]) => {
-    console.log("handleEnabledEdit", id);
+  const handleEnabledEdit = (id: NodeModel["id"]) => enabledEdit(id);
 
-    enabledEdit(id);
-  };
-
-  console.log("workflowsStatus", workflowsStatus);
   const {
     treeData,
     updateTree,
     editTreeName,
     deleteTree,
+    cloneTree,
     createFolderTree,
     createConfigTree,
+
+    // handleDrop,
+    // handleDragStart,
+    // handleDragEnd,
+    // handleDop,
+    // isDragging,
+    // handleClick,
   } = useWorkflows();
+  useEffect(() => {
+    addNewItems(treeData);
+  }, [treeData]);
+
   const handleDrop = (newTree: NodeModel<WorkflowItem>[]) =>
     updateTree(newTree);
   const handleEdit = (id: NodeModel["id"], text: NodeModel["text"]) => {
-    console.log("handleEdit", id, text);
-
+    handleEnabledEdit(id);
     editTreeName(id, text);
   };
   const handleDelete = (id: NodeModel["id"]) => deleteTree(id);
+  const handleClone = (id: NodeModel["id"]) => {
+    cloneTree(id, (newTreeId: NodeModel["id"]) => {
+      handleEnabledEdit(newTreeId); //TODO add sleep
+    });
+  };
   const handelCreateFolder = (id: NodeModel["id"]) => {
     createFolderTree(id);
     if (!workflowsStatusOpenId.includes(id)) {
@@ -64,55 +85,96 @@ function App() {
       }
     }
   };
+  const [search, setSearch] = useState("");
 
+  const treeDataSearch = useMemo(() => {
+    if (search.length > 0) {
+      return treeData.filter(
+        (item) =>
+          (item.text.includes(search) && item.data?.type === "config") ||
+          item.data?.type === "folder"
+      );
+    }
+    return treeData;
+  }, [search, treeData]);
+  const isIncludesConfig = treeDataSearch.some(
+    (item) => item.text.includes(search) && item.data?.type === "config"
+  );
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value.length > 0) {
+      if (isIncludesConfig) {
+        enabledOpenAll();
+      }
+      if (search.length === 0) {
+        saveWorkflowsStatusScreen(workflowsStatus);
+      }
+    }
+  };
+
+  const handleClear = () => {
+    setSearch("");
+    enableWorkflowsStatusScreen();
+  };
   return (
     <>
+      <Search onSearch={handleSearch} onClear={handleClear} />
       <CssBaseline />
-      <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-        <Tree
-          ref={ref}
-          tree={treeData}
-          rootId={0}
-          render={(node, { depth, hasChild, onToggle }) => (
-            <CustomNode
-              {...makePropsTreeItem({
-                workflowsStatus,
-                node,
-              })}
-              node={node}
-              depth={depth}
-              onToggle={(id) => {
-                handleEnabledOpen(id);
-                onToggle();
+      <Box width="60%">
+        <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+          {treeDataSearch.length > 0 && isIncludesConfig ? (
+            <Tree
+              ref={ref}
+              tree={treeDataSearch}
+              rootId={0}
+              render={(node, { depth, hasChild, onToggle }) => (
+                <CustomNode
+                  {...makePropsTreeItem({
+                    workflowsStatus,
+                    node,
+                  })}
+                  treeData={treeData}
+                  node={node}
+                  depth={depth}
+                  onToggle={(id) => {
+                    handleEnabledOpen(id);
+                    onToggle();
+                  }}
+                  hasChild={hasChild}
+                  onEnabledEdit={handleEnabledEdit}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onClone={handleClone}
+                  onCreateConfig={handelCreateConfig}
+                  onCreateFolder={handelCreateFolder}
+                />
+              )}
+              dragPreviewRender={(monitorProps) => (
+                <CustomDragPreview monitorProps={monitorProps} />
+              )}
+              onDrop={handleDrop}
+              classes={{
+                placeholder: styles.placeholderContainer,
+                dropTarget: styles.dropTarget,
               }}
-              hasChild={hasChild}
-              onEnabledEdit={handleEnabledEdit}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onCreateConfig={handelCreateConfig}
-              onCreateFolder={handelCreateFolder}
+              sort={false}
+              insertDroppableFirst={false}
+              canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
+                if (dragSource?.parent === dropTargetId) {
+                  return true;
+                }
+              }}
+              placeholderRender={(node, { depth }) => (
+                <Placeholder node={node} depth={depth} />
+              )}
+              initialOpen={workflowsStatusOpenId}
             />
+          ) : (
+            <div>No found</div>
           )}
-          dragPreviewRender={(monitorProps) => (
-            <CustomDragPreview monitorProps={monitorProps} />
-          )}
-          onDrop={handleDrop}
-          classes={{
-            placeholder: styles.placeholderContainer,
-          }}
-          sort={false}
-          insertDroppableFirst={false}
-          canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
-            if (dragSource?.parent === dropTargetId) {
-              return true;
-            }
-          }}
-          placeholderRender={(node, { depth }) => (
-            <Placeholder node={node} depth={depth} />
-          )}
-          initialOpen={workflowsStatusOpenId}
-        />
-      </DndProvider>
+        </DndProvider>
+      </Box>
     </>
   );
 }

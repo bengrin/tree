@@ -9,6 +9,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
     droppable: false,
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
   },
   {
@@ -41,6 +42,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 4,
@@ -50,6 +52,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 5,
@@ -59,6 +62,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 6,
@@ -77,6 +81,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 8,
@@ -86,6 +91,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 9,
@@ -95,6 +101,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 10,
@@ -104,6 +111,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 11,
@@ -140,6 +148,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 144,
@@ -149,6 +158,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 15,
@@ -176,6 +186,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 18,
@@ -185,6 +196,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 19,
@@ -194,6 +206,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 20,
@@ -203,6 +216,7 @@ export const mockWorkflows: NodeModel<WorkflowItem>[] = [
   {
     data: {
       type: WorkItemType.config,
+      config: 1,
     },
     droppable: false,
     id: 21,
